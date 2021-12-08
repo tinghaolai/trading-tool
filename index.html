@@ -1,0 +1,57 @@
+<html>
+    <head></head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.13.0/theme-chalk/index.css">
+    <style>
+    </style>
+    <body>
+    <div id="app">
+        <el-row>
+            <el-col :span="12" :offset="6">
+                <el-form :model="form" label-width="200px">
+                    <el-form-item label="leverage">
+                        <el-input v-model="form.leverage"></el-input>
+                    </el-form-item>
+                    <el-form-item label="fee percentage">
+                        <span slot="label">
+                            <el-tooltip class="item" effect="dark" content="sum of option position and close position" placement="top-start">
+                              <span>fee percentage</span>
+                            </el-tooltip>
+                        </span>
+                        <el-input v-model="form.fee"></el-input>
+                    </el-form-item>
+                    <el-form-item label="fee percentage with leverage">
+                        <div v-if="form.leverage && form.fee">
+                            {{ form.leverage * form.fee }}
+                        </div>
+                        <div v-else>fill leverage and percentage first!</div>
+                    </el-form-item>
+                    <el-form-item label="target prize high">
+                        <el-input v-model="form.targetPrizeHigh"></el-input>
+                    </el-form-item>
+                    <el-form-item label="target prize low">
+                        <el-input v-model="form.targetPrizeLow"></el-input>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
+    </div>
+    <script src="plugins/vue.js"></script>
+    <script src="plugins/element.min.js"></script>
+    <script src="plugins/moment.min.js"></script>
+    <script type="text/javascript">
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    form: {
+                        fee: null,
+                        leverage: null,
+                        targetPrizeHigh: null,
+                        targetPrizeLow: null,
+                    },
+                };
+            },
+        })
+    </script>
+    </body>
+</html>
