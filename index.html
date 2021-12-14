@@ -14,11 +14,11 @@
                         <el-input v-model="form.leverage"></el-input>
                     </el-form-item>
                     <el-form-item label="fee percentage">
-                        <span slot="label">
-                            <el-tooltip class="item" effect="dark" content="sum of option position and close position" placement="top-start">
-                              <span>fee percentage</span>
-                            </el-tooltip>
-                        </span>
+                            <span slot="label">
+                                <el-tooltip class="item" effect="dark" content="sum of option position and close position" placement="top-start">
+                                  <span>fee percentage</span>
+                                </el-tooltip>
+                            </span>
                         <el-input v-model="form.fee"></el-input>
                     </el-form-item>
                     <el-form-item label="fee percentage with leverage">
@@ -32,6 +32,18 @@
                     </el-form-item>
                     <el-form-item label="target prize low">
                         <el-input v-model="form.targetPrizeLow"></el-input>
+                    </el-form-item>
+                    <el-form-item label="profit">
+                        <div v-if="profit">
+                            {{ profit }} %
+                        </div>
+                        <div v-else>Fill target prize both high and low</div>
+                    </el-form-item>
+                    <el-form-item label="profit with leverage">
+                        <div v-if="profit && form.leverage">
+                            {{ profit * form.leverage }} %
+                        </div>
+                        <div v-else>Fill profit related and leverage</div>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -53,6 +65,15 @@
                     },
                 };
             },
+            computed: {
+                profit: function () {
+                    if (!this.form.targetPrizeHigh || !this.form.targetPrizeLow) {
+                        return null;
+                    }
+
+                    return (this.form.targetPrizeHigh - this.form.targetPrizeLow) / this.form.targetPrizeHigh * 100;
+                },
+            }
         })
     </script>
     </body>
