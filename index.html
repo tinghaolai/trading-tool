@@ -14,11 +14,11 @@
                         <el-input v-model="form.leverage"></el-input>
                     </el-form-item>
                     <el-form-item label="fee percentage">
-                            <span slot="label">
-                                <el-tooltip class="item" effect="dark" content="sum of option position and close position" placement="top-start">
-                                  <span>fee percentage</span>
-                                </el-tooltip>
-                            </span>
+                        <span slot="label">
+                            <el-tooltip class="item" effect="dark" content="sum of option position and close position" placement="top-start">
+                              <span>fee percentage</span>
+                            </el-tooltip>
+                        </span>
                         <el-input v-model="form.fee"></el-input>
                     </el-form-item>
                     <el-form-item label="fee percentage with leverage">
@@ -53,16 +53,31 @@
     <script src="plugins/element.min.js"></script>
     <script src="plugins/moment.min.js"></script>
     <script type="text/javascript">
+        let form = {
+            fee: null,
+            leverage: null,
+            targetPrizeHigh: null,
+            targetPrizeLow: null,
+        };
+
+        function getVueWatch() {
+            let watchObject = {};
+            Object.keys(form).forEach(key => {
+                watchObject['form.' + key] = function () {
+                    localStorage.setItem('form', JSON.stringify(this.form));
+                }
+            });
+
+            return watchObject;
+        }
+
         new Vue({
             el: '#app',
             data() {
+                let storageForm = JSON.parse(localStorage.getItem('form'));
+
                 return {
-                    form: {
-                        fee: null,
-                        leverage: null,
-                        targetPrizeHigh: null,
-                        targetPrizeLow: null,
-                    },
+                    form: (storageForm) ? storageForm : form,
                 };
             },
             computed: {
@@ -73,7 +88,8 @@
 
                     return (this.form.targetPrizeHigh - this.form.targetPrizeLow) / this.form.targetPrizeHigh * 100;
                 },
-            }
+            },
+            watch: getVueWatch(),
         })
     </script>
     </body>
