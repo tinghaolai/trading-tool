@@ -48,6 +48,31 @@
                         </div>
                         <div v-else>Fill profit related and leverage</div>
                     </el-form-item>
+                    <el-form-item label="cycles">
+                        <el-button type="primary" @click="addCycle">Add</el-button>
+                        <el-form>
+                            <div v-for="cycle in form.cycles">
+                                <el-form-item label="cycle">
+                                    <el-select v-model="cycle.cycle">
+                                        <el-option v-for="(setting, value) in constants.cycles"
+                                                   :key="value"
+                                                   :value="value"
+                                                   :label="setting.display">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="prediction">
+                                    <el-select v-model="cycle.prediction">
+                                        <el-option v-for="(setting, value) in constants.predictions"
+                                                   :key="value"
+                                                   :value="value"
+                                                   :label="setting.display">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </div>
+                        </el-form>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -56,11 +81,50 @@
     <script src="plugins/element.min.js"></script>
     <script src="plugins/moment.min.js"></script>
     <script type="text/javascript">
+        class Cycle {
+            constructor() {
+                this.cycle = null;
+                this.prediction = null;
+            }
+        }
+
         let form = {
             fee: null,
             leverage: null,
             targetPrizeHigh: null,
             targetPrizeLow: null,
+            cycles: [new Cycle()],
+        };
+
+        let constants = {
+            cycles: {
+                oneMinute: {
+                    display: '1 minute'
+                },
+                fiveMinutes: {
+                    display: '5 minutes'
+                },
+                halfHour: {
+                    display: '30 minutes',
+                },
+                oneHour: {
+                    display: '1 hour',
+                },
+                fourHours: {
+                    display: '1 hours',
+                },
+            },
+            predictions: {
+                bullish: {
+                    display: '↑',
+                },
+                bearish: {
+                    display: '↓',
+                },
+                unSure: {
+                    display: 'unsure',
+                }
+            },
         };
 
         function getVueWatch() {
