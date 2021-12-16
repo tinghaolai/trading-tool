@@ -9,7 +9,10 @@
     <div id="app">
         <el-row>
             <el-col :span="12" :offset="6">
-                <el-form :model="form" label-width="200px">
+                <el-form label-width="200px" ref="form">
+                    <el-form-item label="">
+                        <el-button @click="cleanForm" type="danger">Clean form</el-button>
+                    </el-form-item>
                     <el-form-item label="leverage">
                         <el-input v-model="form.leverage"></el-input>
                     </el-form-item>
@@ -77,7 +80,8 @@
                 let storageForm = JSON.parse(localStorage.getItem('form'));
 
                 return {
-                    form: (storageForm) ? storageForm : form,
+                    constants: constants,
+                    form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
                 };
             },
             computed: {
@@ -87,6 +91,23 @@
                     }
 
                     return (this.form.targetPrizeHigh - this.form.targetPrizeLow) / this.form.targetPrizeHigh * 100;
+                },
+            },
+            methods: {
+                cleanForm() {
+                    this.form = form;
+                },
+                fixEmptyFormProperty(storageForm, originForm) {
+                    Object.keys(originForm).forEach(originKey => {
+                        if (storageForm[originKey] === undefined) {
+                            storageForm[originKey] = originForm[originKey];
+                        }
+                    });
+
+                    return storageForm;
+                },
+                addCycle() {
+                    this.form.cycles.push(new Cycle());
                 },
             },
             watch: getVueWatch(),
