@@ -74,6 +74,17 @@
                         </el-form>
                     </el-form-item>
                 </el-form>
+                <el-divider></el-divider>
+                <h3>Notes</h3>
+                <el-button type="primary" @click="addNote">Add note</el-button>
+                <template v-for="note in notes">
+                    <el-input @change="noteChanged"
+                              type="textarea"
+                              autosize
+                              placeholder="note anything"
+                              v-model="note.content">
+                    </el-input>
+                </template>
             </el-col>
         </el-row>
     </div>
@@ -88,6 +99,12 @@
             }
         }
 
+        class Note {
+            constructor() {
+                this.content = '';
+            }
+        }
+
         let form = {
             fee: null,
             leverage: null,
@@ -95,6 +112,8 @@
             targetPrizeLow: null,
             cycles: [new Cycle()],
         };
+
+        let notes = [new Note()];
 
         let constants = {
             cycles: {
@@ -142,10 +161,12 @@
             el: '#app',
             data() {
                 let storageForm = JSON.parse(localStorage.getItem('form'));
+                let storageNotes = JSON.parse(localStorage.getItem('notes'));
 
                 return {
                     constants: constants,
                     form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
+                    notes: (storageNotes) ? storageNotes : notes,
                 };
             },
             computed: {
@@ -172,6 +193,12 @@
                 },
                 addCycle() {
                     this.form.cycles.push(new Cycle());
+                },
+                noteChanged() {
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                },
+                addNote() {
+                    this.notes.push(new Note());
                 },
             },
             watch: getVueWatch(),
