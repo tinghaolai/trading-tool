@@ -48,6 +48,16 @@
                         </div>
                         <div v-else>Fill profit related and leverage</div>
                     </el-form-item>
+                    <el-form-item label="current prize">
+                        <el-input v-model="form.currentPrize" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="current ATR">
+                        <el-input v-model="form.currentATR" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="ATR percentage">
+                        <div v-if="atrPercentage">{{ atrPercentage }}</div>
+                        <div v-else>Fill related data</div>
+                    </el-form-item>
                     <el-form-item label="cycles">
                         <el-button type="primary" @click="addCycle">Add</el-button>
                         <el-form>
@@ -110,6 +120,8 @@
             leverage: null,
             targetPrizeHigh: null,
             targetPrizeLow: null,
+            currentPrize: null,
+            currentATR: null,
             cycles: [new Cycle()],
         };
 
@@ -176,6 +188,13 @@
                     }
 
                     return (this.form.targetPrizeHigh - this.form.targetPrizeLow) / this.form.targetPrizeHigh * 100;
+                },
+                atrPercentage: function () {
+                   if (!this.form.currentPrize || !this.form.currentATR)  {
+                       return null;
+                   }
+
+                   return this.form.currentATR / this.form.currentPrize * 100 + ' %';
                 },
             },
             methods: {
