@@ -85,6 +85,39 @@
                     </el-form-item>
                 </el-form>
                 <el-divider></el-divider>
+                <h3>Money</h3>
+                <el-form label-width="200px" ref="moneyForm">
+                    <el-form-item label="add record">
+                        <el-button @click="moneyForm.changes.push(null)" type="primary">add money change</el-button>
+                        <el-button @click="storeMoneyRecord" type="success">Store record</el-button>
+                    </el-form-item>
+                    <el-form-item label="start money">
+                        <el-input v-model.number="moneyForm.start" type="number" style="width: 70%"></el-input>
+                    </el-form-item>
+                    <template v-for="(change, index) in moneyForm.changes">
+                        <el-form-item :label="'money change ' + (index + 1)">
+                            <el-input v-model.number="moneyForm.changes[index]" type="number" style="width: 70%"></el-input>
+                            <span v-if="moneyForm.start && change">{{ countPercentage(change, moneyForm.start) }}%</span>
+                        </el-form-item>
+                    </template>
+
+                </el-form>
+                <el-divider></el-divider>
+                <h3>Money Records</h3>
+                <el-form label-width="200px">
+                    <template v-for="(record, recordIndex) in moneyRecords">
+                        <el-form-item :label="record.time">
+                            <el-button type="danger" @click="moneyRecords.splice(recordIndex, 1);">Delete</el-button>
+                        </el-form-item>
+                        <el-form-item>
+                            <div>start: {{ record.start }}</div>
+                        </el-form-item>
+                        <el-form-item v-for="(change, index) in record.changes" :key="index">
+                            <span>change {{ index + 1 }}: {{ change }}  ({{ countPercentage(change, record.start) }}%)</span>
+                        </el-form-item>
+                    </template>
+                </el-form>
+                <el-divider></el-divider>
                 <h3>Notes</h3>
                 <el-button type="primary" @click="addNote">Add note</el-button>
                 <template v-for="note in notes">
@@ -166,6 +199,10 @@
                 }
             });
 
+            watchObject.moneyRecords = function () {
+                localStorage.setItem('contractTradingMoneyRecords', JSON.stringify(this.moneyRecords));
+            };
+
             return watchObject;
         }
 
@@ -174,11 +211,17 @@
             data() {
                 let storageForm = JSON.parse(localStorage.getItem('form'));
                 let storageNotes = JSON.parse(localStorage.getItem('notes'));
+                let moneyRecords = JSON.parse(localStorage.getItem('contractTradingMoneyRecords'));
 
                 return {
+                    moneyForm: {
+                        start: null,
+                        changes: [],
+                    },
                     constants: constants,
                     form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
                     notes: (storageNotes) ? storageNotes : notes,
+                    moneyRecords: (moneyRecords) ? moneyRecords : [],
                 };
             },
             computed: {
@@ -218,6 +261,17 @@
                 },
                 addNote() {
                     this.notes.push(new Note());
+                },
+                countPercentage(change, start) {
+                    return (change - start) / start * 100;
+                },
+                storeMoneyRecord() {
+                    this.moneyForm.time = moment().format('YYYY-MM-DD HH:mm:ss');
+                    this.moneyRecords.push(JSON.parse(JSON.stringify(this.moneyForm)));
+                    this.moneyForm = {
+                        start: null,
+                        changes: [],
+                    };
                 },
             },
             watch: getVueWatch(),
