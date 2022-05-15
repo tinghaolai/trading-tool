@@ -107,14 +107,20 @@
                 <el-form label-width="200px">
                     <template v-for="(record, recordIndex) in moneyRecords">
                         <el-form-item :label="record.time">
+                            <el-button type="success" @click="addRecordChange(recordIndex)">Add record</el-button>
                             <el-button type="danger" @click="moneyRecords.splice(recordIndex, 1);">Delete</el-button>
                         </el-form-item>
                         <el-form-item>
                             <div>start: {{ record.start }}</div>
                         </el-form-item>
-                        <el-form-item v-for="(change, index) in record.changes" :key="index">
-                            <span>change {{ index + 1 }}: {{ change }}  ({{ countPercentage(change, record.start) }}%)</span>
-                        </el-form-item>
+                        <template v-for="(change, index) in record.changes">
+                            <el-form-item>
+                                <span>change {{ index + 1 }}: </span>
+                                <el-input v-model="record.changes[index]" v-if="recordEditing" @keypress.native.enter="recordEditing = false"></el-input>
+                                <span v-else @click="recordEditing = !recordEditing">{{ change }}</span>
+                                <span>({{ countPercentage(change, record.start) }}%)</span>
+                            </el-form-item>
+                        </template>
                     </template>
                 </el-form>
                 <el-divider></el-divider>
@@ -194,13 +200,19 @@
         function getVueWatch() {
             let watchObject = {};
             Object.keys(form).forEach(key => {
-                watchObject['form.' + key] = function () {
-                    localStorage.setItem('form', JSON.stringify(this.form));
-                }
+                watchObject['form.' + key] = {
+                    handler() {
+                        localStorage.setItem('form', JSON.stringify(this.form));
+                    },
+                    deep: true,
+                };
             });
 
-            watchObject.moneyRecords = function () {
-                localStorage.setItem('contractTradingMoneyRecords', JSON.stringify(this.moneyRecords));
+            watchObject.moneyRecords = {
+                handler() {
+                    localStorage.setItem('contractTradingMoneyRecords', JSON.stringify(this.moneyRecords));
+                },
+                deep: true,
             };
 
             return watchObject;
@@ -222,6 +234,7 @@
                     form: (storageForm) ? this.fixEmptyFormProperty(storageForm, form) : form,
                     notes: (storageNotes) ? storageNotes : notes,
                     moneyRecords: (moneyRecords) ? moneyRecords : [],
+                    recordEditing: false,
                 };
             },
             computed: {
@@ -272,6 +285,9 @@
                         start: null,
                         changes: [],
                     };
+                },
+                addRecordChange(recordIndex) {
+                    this.moneyRecords[recordIndex].changes.push(null);
                 },
             },
             watch: getVueWatch(),
